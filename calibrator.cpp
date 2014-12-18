@@ -22,6 +22,7 @@ public:
     inline LineFunction getBottomLineFunction() { return LineFunction(Point(0, bottomLineY1), Point(maxWidth, bottomLineY2)); }
     inline LineFunction getLeftLineFunction()   { return LineFunction(Point(leftLineX1, 0), Point(leftLineX2, maxWidth)); }
     inline LineFunction getRightLineFunction()  { return LineFunction(Point(rightLineX1, 0), Point(rightLineX2, maxWidth)); }
+    bool isInsideBoundary(Point point);
 
 private:
 
@@ -45,7 +46,61 @@ private:
     void addTrackbarToWindow();
     static void onCalibratorChange(int value, void * userData);
 
+    bool isUnderTopLine(Point point);
+    bool isAboveBottomLine(Point point);
+    bool isAboveLeftLine(Point point);
+    bool isUnderRightLine(Point point);
+
 };
+
+bool CalibratorWindow::isInsideBoundary(Point point) {
+    return isAboveLeftLine(point) && isUnderRightLine(point) &&
+           isUnderTopLine(point) && isUnderTopLine(point);
+}
+
+bool CalibratorWindow::isAboveLeftLine(Point point) {
+    if (leftLineX1 == leftLineX2) {
+        return point.x >= (leftLineX1 + margin);
+    }
+    else {
+        LineFunction lineFunction = getLeftLineFunction();
+        cout << "ttt:" << ((point.y - (lineFunction.c)) / lineFunction.ax) << "\n";
+        cout << "point.x:" << point.x << "\n";
+        return point.x >= ((point.y - (lineFunction.c)) / lineFunction.ax) + margin;
+    }
+}
+
+bool CalibratorWindow::isUnderRightLine(Point point) {
+    if (rightLineX1 == rightLineX2) {
+        return point.x <= (rightLineX1 - margin);
+    }
+    else {
+        LineFunction lineFunction = getRightLineFunction();
+        return point.x <= ((point.y - (lineFunction.c)) / lineFunction.ax) - margin;
+    }
+}
+
+bool CalibratorWindow::isUnderTopLine(Point point) {
+    
+    if (topLineY1 == topLineY2) { 
+        return point.y >= topLineY1 + margin; 
+    }
+    else {
+        LineFunction lineFunction = getTopLineFunction();
+        return point.y >= ((lineFunction.ax * point.x + lineFunction.c) + margin);
+    }
+}
+
+bool CalibratorWindow::isAboveBottomLine(Point point) {
+    
+    if (topLineY1 == topLineY2) { 
+        return point.y <= topLineY1 - margin; 
+    }
+    else {
+        LineFunction lineFunction = getTopLineFunction();
+        return point.y <= ((lineFunction.ax * point.x + lineFunction.c) - margin);
+    }
+}
 
 void CalibratorWindow::onCalibratorChange(int value, void * userData) {
 
