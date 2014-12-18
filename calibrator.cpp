@@ -9,11 +9,11 @@ using namespace cv;
 #define CALIBRATOR_WINDOW      "Calibrator"
 #define IMAGE_WINDOW           "Image"
 
-class CalibratorBar {
+class CalibratorWindow {
 
 public:
-    void addTrackbarToWindow();
     void drawBoundary(Mat & image);
+    void showWindow();
 
 private:
     int topLineY1;
@@ -24,17 +24,31 @@ private:
     int leftLineX2;
     int rightLineX1;
     int rightLineX2;
+    int angleThreshold;
+    int margin;
+    int proturdingThreshold;
+
+    void addTrackbarToWindow();
+
 };
 
-void CalibratorBar::addTrackbarToWindow() {
-    topLineY1 = 0;
-    topLineY2 = 0;
-    bottomLineY1 = MAX_HEIGHT;
-    bottomLineY2 = MAX_HEIGHT;
-    leftLineX1 = 0;
-    leftLineX2 = 0;
-    rightLineX1 = MAX_WIDTH;
-    rightLineX2 = MAX_WIDTH;
+void CalibratorWindow::showWindow() {
+    cv::namedWindow(CALIBRATOR_WINDOW);
+    this->addTrackbarToWindow();
+}
+
+void CalibratorWindow::addTrackbarToWindow() {
+    this->topLineY1 = 0;
+    this->topLineY2 = 0;
+    this->bottomLineY1 = MAX_HEIGHT;
+    this->bottomLineY2 = MAX_HEIGHT;
+    this->leftLineX1 = 0;
+    this->leftLineX2 = 0;
+    this->rightLineX1 = MAX_WIDTH;
+    this->rightLineX2 = MAX_WIDTH;
+    this->angleThreshold = 10;
+    this->margin = 0;
+    this->proturdingThreshold = 0;
 
     createTrackbar("TopLine Y1", CALIBRATOR_WINDOW, &(this->topLineY1), MAX_HEIGHT);
     createTrackbar("TopLine Y2", CALIBRATOR_WINDOW, &(this->topLineY2), MAX_HEIGHT);
@@ -44,9 +58,13 @@ void CalibratorBar::addTrackbarToWindow() {
     createTrackbar("LeftLine X2", CALIBRATOR_WINDOW, &(this->leftLineX2), MAX_WIDTH);
     createTrackbar("RightLine X1", CALIBRATOR_WINDOW, &(this->rightLineX1), MAX_WIDTH);
     createTrackbar("RightLine X2", CALIBRATOR_WINDOW, &(this->rightLineX2), MAX_WIDTH);
+    createTrackbar("Angle Threshold", CALIBRATOR_WINDOW, &(this->angleThreshold), 90);
+    createTrackbar("Inside Margin", CALIBRATOR_WINDOW, &(this->margin), 100);
+    createTrackbar("Proturding Threshold", CALIBRATOR_WINDOW, &(this->proturdingThreshold), 100);
+
 }
 
-void CalibratorBar::drawBoundary(Mat & image) {
+void CalibratorWindow::drawBoundary(Mat & image) {
     cv::line(image, Point(0, topLineY1), Point(MAX_WIDTH, topLineY2), Scalar(0, 0, 255), 1.5);
     cv::line(image, Point(0, bottomLineY1), Point(MAX_WIDTH, bottomLineY2), Scalar(0, 255, 255), 1.5);
     cv::line(image, Point(leftLineX1, 0), Point(leftLineX2, MAX_WIDTH), Scalar(255, 0, 255), 1.5);
@@ -54,18 +72,16 @@ void CalibratorBar::drawBoundary(Mat & image) {
 }
 
 int main(int argc, char ** argv) {
-    
 
-    CalibratorBar calibratorBar;
+    CalibratorWindow calibratorWindow;
     Mat image = imread("/mnt/WinD/Dropbox/Photos/Win8Login.jpg");
+    calibratorWindow.showWindow();
     cv::namedWindow(IMAGE_WINDOW);
-    cv::namedWindow(CALIBRATOR_WINDOW);
-    calibratorBar.addTrackbarToWindow();
 
     while (true) {
       Mat resized;
       cv::resize(image, resized, Size(MAX_WIDTH, MAX_HEIGHT));
-      calibratorBar.drawBoundary(resized);
+      calibratorWindow.drawBoundary(resized);
       cv::imshow(IMAGE_WINDOW, resized);
       cv::waitKey(100);
     }
