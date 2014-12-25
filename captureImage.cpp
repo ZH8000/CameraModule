@@ -1,10 +1,14 @@
 #include <opencv2/opencv.hpp>
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/nonfree/features2d.hpp"
+#include "CalibratorWindow.hpp"
 
 #include <string>
 #include <sstream>
 #include <iostream>
+
+#define MAX_WIDTH   320
+#define MAX_HEIGHT  240
 
 using namespace cv;
 using namespace std;
@@ -43,7 +47,6 @@ void FeatureProcessor::drawFeatureCount(int featureCount) {
     putText(*image, messageString, Point(0, 100), FONT_HERSHEY_DUPLEX, 0.5, Scalar(0, 0, 255));
 }
 
-
 int main(int, char**)
 {
     VideoCapture cap(0); // open the default camera
@@ -52,6 +55,8 @@ int main(int, char**)
         return -1;
 
     namedWindow("Preview",1);
+    CalibratorWindow calibrator("Calibrator", "Preview", MAX_WIDTH, MAX_HEIGHT);
+    calibrator.showWindow();
 
     for(;;)
     {
@@ -60,12 +65,13 @@ int main(int, char**)
         Mat grayImage;
         cap >> frame;
 
-        resize(frame, resizedImage, Size(320, 240));
+        resize(frame, resizedImage, Size(MAX_WIDTH, MAX_HEIGHT));
 
         FeatureProcessor processor(&resizedImage);
         int featureCount = processor.getFeatureCount(500);
         processor.drawFeatureCount(featureCount);
 
+        calibrator.drawBoundary(resizedImage);
         imshow("Preview", resizedImage);
 
         if(waitKey(30) >= 0) break;
