@@ -18,6 +18,8 @@ public:
     double ax;
     double by;
     double c;
+    double inverseXYSlope;
+    void drawSlopeInfo(Mat & image);
 
     friend std::ostream & operator<<(std::ostream & stream, LineFunction const & obj);
 

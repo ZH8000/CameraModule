@@ -19,6 +19,7 @@ public:
     inline LineFunction getLeftLineFunction()   { return LineFunction(Point(leftLineX1, 0), Point(leftLineX2, maxWidth)); }
     inline LineFunction getRightLineFunction()  { return LineFunction(Point(rightLineX1, 0), Point(rightLineX2, maxWidth)); }
     bool isInsideBoundary(Point point);
+    inline int getFeatureMinHessian() {return this->featureMinHessian;}
 
 private:
 
@@ -38,6 +39,7 @@ private:
     int angleThreshold;
     int margin;
     int proturdingThreshold;
+    int featureMinHessian;
 
     void addTrackbarToWindow();
     static void onCalibratorChange(int value, void * userData);

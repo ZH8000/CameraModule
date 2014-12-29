@@ -1,13 +1,17 @@
 #include "LineFunction.hpp"
 
 LineFunction LineFunction::fromInverseXY(double slope, double c) {
+
     double y1 = slope * 0 + c;   // (0, y1)
     double y2 = slope * 100 + c; // (100, y2)
+    LineFunction line = LineFunction(Point2d(y1, 0), Point2d(y2, 100));
+    line.inverseXYSlope = slope;
 
-    return LineFunction(Point2d(y1, 0), Point2d(y2, 100));
+    return line;
 }
 
 LineFunction::LineFunction(double ax, double by, double c) {
+    this->inverseXYSlope = NAN;
     this->ax = ax;
     this->by = by;
     this->c = c;
@@ -20,6 +24,30 @@ LineFunction::LineFunction(Point2d point1, Point2d point2)
     this->ax = slope;
     this->by = -1;
     this->c = c;
+}
+
+void LineFunction::drawSlopeInfo(Mat & image) {
+    int startPointX = 80;
+    int startPointY = 120;
+    int endPointX = 200;
+    int endPointY = (int) (startPointY + (this->inverseXYSlope * (endPointX - startPointX)));
+
+    if (!isnan(this->inverseXYSlope)) {
+      cv::line(
+          image,
+          cvPoint(startPointY, startPointX),
+          cvPoint(endPointY, endPointX),
+          CV_RGB(255,255,0), 2
+      );
+    }
+
+    std::stringstream message;
+    message << "slope:" << this->inverseXYSlope;
+    string messageString = message.str();
+    
+    putText(image, messageString, Point(5, 100), CV_FONT_HERSHEY_PLAIN, 1, Scalar(0, 0, 255));
+
+
 }
 
 double LineFunction::getAngleWith(LineFunction that) {

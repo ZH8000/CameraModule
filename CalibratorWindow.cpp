@@ -1,5 +1,7 @@
 #include "CalibratorWindow.hpp"
 
+
+
 bool CalibratorWindow::isInsideBoundary(Point point) {
     return isAboveLeftLine(point) && isUnderRightLine(point) &&
            isUnderTopLine(point) && isUnderTopLine(point);
@@ -83,6 +85,7 @@ void CalibratorWindow::addTrackbarToWindow() {
     this->angleThreshold = 10;
     this->margin = 0;
     this->proturdingThreshold = 0;
+    this->featureMinHessian = 800;
 
     createTrackbar("TopLine Y1", calibratorWindow, &(this->topLineY1), maxHeight, &onCalibratorChange, this);
     createTrackbar("TopLine Y2", calibratorWindow, &(this->topLineY2), maxHeight, &onCalibratorChange, this);
@@ -95,6 +98,7 @@ void CalibratorWindow::addTrackbarToWindow() {
     createTrackbar("Angle Threshold", calibratorWindow, &(this->angleThreshold), 90);
     createTrackbar("Inside Margin", calibratorWindow, &(this->margin), 100);
     createTrackbar("Proturding Threshold", calibratorWindow, &(this->proturdingThreshold), 100);
+    createTrackbar("Feature Min Hessian", calibratorWindow, &(this->featureMinHessian), 2000);
 
 }
 
