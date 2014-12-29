@@ -24,7 +24,8 @@ public:
     LineFunction getFitLine(vector<KeyPoint> keyPoints);
     void drawAngleInfo(double angle);
     void drawSlopeInfo(LineFunction & fitLine);
-    void drawBoundray();
+    void drawBoundary();
+    void drawKeyPoints();
 
 private:
 
@@ -96,10 +97,35 @@ void FeatureProcessor::drawAngleInfo(double angle) {
     putText(*image, messageString, Point(5, 130), CV_FONT_HERSHEY_PLAIN, 1, CV_RGB(255, 0, 0));
 }
 
-void FeatureProcessor::drawBoundray() {
+void FeatureProcessor::drawBoundary() {
     calibrator->drawBoundary(*image);
 }
 
+void FeatureProcessor::drawKeyPoints() {
+    SurfFeatureDetector detector(calibrator->getFeatureMinHessian());
+    vector<KeyPoint> keyPoints;
+
+    detector.detect(grayImage, keyPoints);
+
+    for(vector<KeyPoint>::iterator it = keyPoints.begin(); it != keyPoints.end(); it++) {
+        int radius = cvRound(it->size*1.2/9.*2);
+        Point center = it->pt;
+
+        if (it->size <= calibrator->getMinKeyPointSize()) {
+            if (calibrator->isAboveLeftLine(it->pt) && calibrator->isUnderRightLine(it->pt)) {
+                if (calibrator->isUnderTopLine(it->pt)) {
+                    circle(*image, center, radius, CV_RGB(255, 0, 0));
+                } else {
+                    circle(*image, center, radius, CV_RGB(0, 255, 0));
+                }
+            } else {
+                circle(*image, center, radius, CV_RGB(0, 0, 255));
+            }
+        } else {
+            //circle(image, center, radius, CV_RGB(255, 0, 255));
+        }
+    }
+}
 
 LineFunction FeatureProcessor::getFitLine(vector<KeyPoint> keyPoints) {
     int validPointCount = keyPoints.size();
@@ -160,11 +186,12 @@ int main(int, char**)
             processor.drawAngleInfo(angle);
         }
 
+        processor.drawBoundary();
         processor.drawFeatureCount(keyPoints.size());
         processor.drawSlopeInfo(fitLine);
-        drawKeypoints(resizedImage, keyPoints, imageWithKeyPoints, CV_RGB(255, 0, 0), DrawMatchesFlags::DEFAULT);
+        processor.drawKeyPoints();
 
-        imshow("Preview", imageWithKeyPoints);
+        imshow("Preview", resizedImage);
         waitKey(30);
     }
 
