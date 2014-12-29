@@ -13,8 +13,6 @@ bool CalibratorWindow::isAboveLeftLine(Point point) {
     }
     else {
         LineFunction lineFunction = getLeftLineFunction();
-        cout << "ttt:" << ((point.y - (lineFunction.c)) / lineFunction.ax) << "\n";
-        cout << "point.x:" << point.x << "\n";
         return point.x >= ((point.y - (lineFunction.c)) / lineFunction.ax) + margin;
     }
 }
@@ -55,10 +53,12 @@ void CalibratorWindow::onCalibratorChange(int value, void * userData) {
 
     CalibratorWindow * calibrator = (CalibratorWindow *) userData;
 
+    /*
     cout << "================================================" << "\n";
     cout << "TopBottom: " << calibrator->getTopLineFunction() << "\t\t" << calibrator->getBottomLineFunction() << "\n";
     cout << "LeftRight: " << calibrator->getLeftLineFunction() << "\t\t" << calibrator->getRightLineFunction() << "\n";
     cout << "================================================" << "\n";
+    */
 }
 
 CalibratorWindow::CalibratorWindow(const string calibratorWindow, const string imageWindow, const int maxWidth, const int maxHeight) {

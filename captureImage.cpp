@@ -26,6 +26,7 @@ public:
     void drawSlopeInfo(LineFunction & fitLine);
     void drawBoundary();
     void drawKeyPoints();
+    double detectOblique(LineFunction fitLine);
 
 private:
 
@@ -152,6 +153,19 @@ LineFunction FeatureProcessor::getFitLine(vector<KeyPoint> keyPoints) {
     return LineFunction::fromInverseXY(slope, c0);
 }
 
+double FeatureProcessor::detectOblique(LineFunction fitLine) {
+    double result = NAN;
+
+    if (fitLine.isValidFitLine()) {
+        LineFunction bottomLine = calibrator->getBottomLineFunction();
+        double angle = bottomLine.getAngleWith(fitLine);
+        double angleDiff = bottomLine.getAngleDiffWith(fitLine);
+        result = angle;
+    }
+
+    return result;
+}
+
 int main(int, char**)
 {
     VideoCapture cap(1); // open the default camera
@@ -178,16 +192,11 @@ int main(int, char**)
         vector<KeyPoint> keyPoints = processor.getValidKeyPoints();
 
         LineFunction fitLine = processor.getFitLine(keyPoints);
-
-        if (fitLine.isValidFitLine()) {
-            LineFunction bottomLine = calibrator.getBottomLineFunction();
-            double angle = bottomLine.getAngleWith(fitLine);
-            double angleDiff = bottomLine.getAngleDiffWith(fitLine);
-            processor.drawAngleInfo(angle);
-        }
+        double angle = processor.detectOblique(fitLine);
 
         processor.drawBoundary();
         processor.drawFeatureCount(keyPoints.size());
+        processor.drawAngleInfo(angle);
         processor.drawSlopeInfo(fitLine);
         processor.drawKeyPoints();
 
