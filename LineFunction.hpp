@@ -19,7 +19,7 @@ public:
     double by;
     double c;
     double inverseXYSlope;
-    void drawSlopeInfo(Mat & image);
+    bool isValidFitLine();
 
     friend std::ostream & operator<<(std::ostream & stream, LineFunction const & obj);
 

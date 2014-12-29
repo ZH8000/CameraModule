@@ -1,5 +1,9 @@
 #include "LineFunction.hpp"
 
+bool LineFunction::isValidFitLine() {
+    return !isnan(this->inverseXYSlope);
+}
+
 LineFunction LineFunction::fromInverseXY(double slope, double c) {
 
     double y1 = slope * 0 + c;   // (0, y1)
@@ -26,30 +30,6 @@ LineFunction::LineFunction(Point2d point1, Point2d point2)
     this->c = c;
 }
 
-void LineFunction::drawSlopeInfo(Mat & image) {
-    int startPointX = 80;
-    int startPointY = 120;
-    int endPointX = 200;
-    int endPointY = (int) (startPointY + (this->inverseXYSlope * (endPointX - startPointX)));
-
-    if (!isnan(this->inverseXYSlope)) {
-      cv::line(
-          image,
-          cvPoint(startPointY, startPointX),
-          cvPoint(endPointY, endPointX),
-          CV_RGB(255,255,0), 2
-      );
-    }
-
-    std::stringstream message;
-    message << "slope:" << this->inverseXYSlope;
-    string messageString = message.str();
-    
-    putText(image, messageString, Point(5, 100), CV_FONT_HERSHEY_PLAIN, 1, Scalar(0, 0, 255));
-
-
-}
-
 double LineFunction::getAngleWith(LineFunction that) {
 
     if (!isinf(that.ax) && !isnan(that.ax)) {
@@ -67,8 +47,8 @@ double LineFunction::getAngleWith(LineFunction that) {
 
 double LineFunction::getAngleDiffWith(LineFunction that) {
     double angle1 = this->getAngleWith(that);
-    double angle2 = 180 - angle1;
-    return abs(angle1 - angle2);
+    double angle2 = 180.0 - angle1;
+    return fabs(angle1 - angle2);
 }
 
 std::ostream & operator<<(std::ostream & stream, LineFunction const & obj) { 

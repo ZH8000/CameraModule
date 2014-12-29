@@ -23,6 +23,8 @@ public:
     void drawFeatureCount(int featureCount);
     vector<KeyPoint> getValidKeyPoints();
     LineFunction getFitLine(vector<KeyPoint> keyPoints);
+    void drawAngleInfo(double angle);
+    void drawSlopeInfo(LineFunction & fitLine);
 
 private:
 
@@ -43,10 +45,13 @@ vector<KeyPoint> FeatureProcessor::getValidKeyPoints() {
     vector<KeyPoint> keyPoints;
     vector<KeyPoint> keyPointsInBounds;
 
-    detector.detect(*image, keyPoints);
+    detector.detect(grayImage, keyPoints);
 
     for(vector<KeyPoint>::iterator it = keyPoints.begin(); it != keyPoints.end(); it++) {
-        if (calibrator->isInsideBoundary(it->pt) && it->size <= 30) {
+        if (calibrator->isUnderTopLine(it->pt) &&
+            calibrator->isAboveLeftLine(it->pt) && 
+            calibrator->isUnderRightLine(it->pt) &&
+            it->size <= 30) {
             keyPointsInBounds.push_back(*it);
         }
     }
@@ -57,17 +62,48 @@ vector<KeyPoint> FeatureProcessor::getValidKeyPoints() {
 int FeatureProcessor::getFeatureCount(int featureThreshold) {
     SurfFeatureDetector detector(featureThreshold);
     vector<KeyPoint> keyPoints;
-    detector.detect(*image, keyPoints);
+    detector.detect(grayImage, keyPoints);
     return keyPoints.size();
 }
+
 
 void FeatureProcessor::drawFeatureCount(int featureCount) {
 
     std::stringstream message;
     message << "f:" << featureCount;
     string messageString = message.str();
-    putText(*image, messageString, Point(5, 120), CV_FONT_HERSHEY_PLAIN, 1, CV_RGB(255, 0, 0));
+    putText(*image, messageString, Point(5, 100), CV_FONT_HERSHEY_PLAIN, 1, CV_RGB(255, 0, 0));
 }
+
+void FeatureProcessor::drawSlopeInfo(LineFunction & fitLine) {
+    int startPointX = 80;
+    int startPointY = 120;
+    int endPointX = 200;
+    int endPointY = (int) (startPointY + (fitLine.inverseXYSlope * (endPointX - startPointX)));
+
+    if (!isnan(fitLine.inverseXYSlope)) {
+      cv::line(
+          *image,
+          cvPoint(startPointY, startPointX),
+          cvPoint(endPointY, endPointX),
+          CV_RGB(255,255,0), 2
+      );
+    }
+
+    std::stringstream message;
+    message << "slope:" << fitLine.inverseXYSlope;
+    string messageString = message.str();
+    
+    putText(*image, messageString, Point(5, 115), CV_FONT_HERSHEY_PLAIN, 1, Scalar(0, 0, 255));
+}
+
+void FeatureProcessor::drawAngleInfo(double angle) {
+    std::stringstream message;
+    message << "angle:" << angle;
+    string messageString = message.str();
+    putText(*image, messageString, Point(5, 130), CV_FONT_HERSHEY_PLAIN, 1, CV_RGB(255, 0, 0));
+}
+
 
 LineFunction FeatureProcessor::getFitLine(vector<KeyPoint> keyPoints) {
     int validPointCount = keyPoints.size();
@@ -122,9 +158,17 @@ int main(int, char**)
 
         calibrator.drawBoundary(resizedImage);
         vector<KeyPoint> keyPoints = processor.getValidKeyPoints();
-        drawKeypoints(resizedImage, keyPoints, imageWithKeyPoints, CV_RGB(255, 0, 0), DrawMatchesFlags::DEFAULT);
         LineFunction fitLine = processor.getFitLine(keyPoints);
-        fitLine.drawSlopeInfo(imageWithKeyPoints);
+
+        if (fitLine.isValidFitLine()) {
+            LineFunction bottomLine = calibrator.getBottomLineFunction();
+            double angle = bottomLine.getAngleWith(fitLine);
+            double angleDiff = bottomLine.getAngleDiffWith(fitLine);
+            processor.drawAngleInfo(angle);
+        }
+
+        processor.drawSlopeInfo(fitLine);
+        drawKeypoints(resizedImage, keyPoints, imageWithKeyPoints, CV_RGB(255, 0, 0), DrawMatchesFlags::DEFAULT);
 
         imshow("Preview", imageWithKeyPoints);
         waitKey(30);

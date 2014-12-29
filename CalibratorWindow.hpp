@@ -20,6 +20,10 @@ public:
     inline LineFunction getRightLineFunction()  { return LineFunction(Point(rightLineX1, 0), Point(rightLineX2, maxWidth)); }
     bool isInsideBoundary(Point point);
     inline int getFeatureMinHessian() {return this->featureMinHessian;}
+    bool isUnderTopLine(Point point);
+    bool isAboveBottomLine(Point point);
+    bool isAboveLeftLine(Point point);
+    bool isUnderRightLine(Point point);
 
 private:
 
@@ -44,10 +48,6 @@ private:
     void addTrackbarToWindow();
     static void onCalibratorChange(int value, void * userData);
 
-    bool isUnderTopLine(Point point);
-    bool isAboveBottomLine(Point point);
-    bool isAboveLeftLine(Point point);
-    bool isUnderRightLine(Point point);
 
 };
 
