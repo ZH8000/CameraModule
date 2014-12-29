@@ -27,6 +27,7 @@ public:
     void drawBoundary();
     void drawKeyPoints();
     double detectOblique(LineFunction fitLine);
+    bool isOblique(LineFunction fitLine, double & angle, double & angleDiff);
 
 private:
 
@@ -153,17 +154,16 @@ LineFunction FeatureProcessor::getFitLine(vector<KeyPoint> keyPoints) {
     return LineFunction::fromInverseXY(slope, c0);
 }
 
-double FeatureProcessor::detectOblique(LineFunction fitLine) {
-    double result = NAN;
+bool FeatureProcessor::isOblique(LineFunction fitLine, double & angle, double & angleDiff) {
 
     if (fitLine.isValidFitLine()) {
         LineFunction bottomLine = calibrator->getBottomLineFunction();
-        double angle = bottomLine.getAngleWith(fitLine);
-        double angleDiff = bottomLine.getAngleDiffWith(fitLine);
-        result = angle;
+        angle = bottomLine.getAngleWith(fitLine);
+        angleDiff = bottomLine.getAngleDiffWith(fitLine);
+        return angleDiff >= calibrator->getMaxAngleDiff();
+    } else {
+        return false;
     }
-
-    return result;
 }
 
 int main(int, char**)
@@ -192,7 +192,14 @@ int main(int, char**)
         vector<KeyPoint> keyPoints = processor.getValidKeyPoints();
 
         LineFunction fitLine = processor.getFitLine(keyPoints);
-        double angle = processor.detectOblique(fitLine);
+        double angle = NAN;
+        double angleDiff = NAN;
+        
+        bool isOblique = processor.isOblique(fitLine, angle, angleDiff);
+
+        if (isOblique && !isnan(angle)) {
+            putText(resizedImage, "OBLIQUE!!", Point(50, 50), CV_FONT_HERSHEY_PLAIN, 1.5, CV_RGB(255, 255, 0));
+        }
 
         processor.drawBoundary();
         processor.drawFeatureCount(keyPoints.size());

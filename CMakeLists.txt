@@ -3,8 +3,6 @@ project( DisplayImage )
 find_package( OpenCV REQUIRED )
 include_directories(${GSL_INCLUDE_DIRS} ${GSLCBLAS_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${GSL_LIBRARIES} ${GSLCBLAS_LIBRARIES})
-add_executable(calibrator calibrator.cpp CalibratorWindow.cpp LineFunction.cpp)
 add_executable(captureImage captureImage.cpp CalibratorWindow.cpp LineFunction.cpp)
 
-target_link_libraries(calibrator ${OpenCV_LIBS} -lgsl)
 target_link_libraries(captureImage ${OpenCV_LIBS} -lgsl)

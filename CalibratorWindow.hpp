@@ -27,6 +27,7 @@ public:
     inline LineFunction getRightLineFunction()  { return LineFunction(Point(rightLineX1, 0), Point(rightLineX2, maxWidth)); }
     inline int getFeatureMinHessian() {return this->featureMinHessian;}
     inline int getMinKeyPointSize() { return this->keyPointSizeTreshold; }
+    inline int getMaxAngleDiff() { return this->angleThreshold; }
 
 private:
 
