@@ -1,5 +1,8 @@
 #include "ErrorDetector.hpp"
 
+#define MAX_WIDTH   320
+#define MAX_HEIGHT  240
+
 
 int main(int, char**)
 {
@@ -16,8 +19,6 @@ int main(int, char**)
     {
         Mat frame;
         Mat resizedImage;
-        Mat grayImage;
-        Mat imageWithKeyPoints;
 
         cap >> frame;
 

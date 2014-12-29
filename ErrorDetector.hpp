@@ -12,8 +12,6 @@
 #include <sstream>
 #include <iostream>
 
-#define MAX_WIDTH   320
-#define MAX_HEIGHT  240
 
 using namespace cv;
 using namespace std;
