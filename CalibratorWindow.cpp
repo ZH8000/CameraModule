@@ -86,6 +86,7 @@ void CalibratorWindow::addTrackbarToWindow() {
     this->margin = 0;
     this->proturdingThreshold = 0;
     this->featureMinHessian = 800;
+    this->keyPointSizeTreshold = 30;
 
     createTrackbar("TopLine Y1", calibratorWindow, &(this->topLineY1), maxHeight, &onCalibratorChange, this);
     createTrackbar("TopLine Y2", calibratorWindow, &(this->topLineY2), maxHeight, &onCalibratorChange, this);
@@ -99,6 +100,7 @@ void CalibratorWindow::addTrackbarToWindow() {
     createTrackbar("Inside Margin", calibratorWindow, &(this->margin), 100);
     createTrackbar("Proturding Threshold", calibratorWindow, &(this->proturdingThreshold), 100);
     createTrackbar("Feature Min Hessian", calibratorWindow, &(this->featureMinHessian), 2000);
+    createTrackbar("Key Point Size Treshold", calibratorWindow, &(this->keyPointSizeTreshold), 200);
 
 }
 

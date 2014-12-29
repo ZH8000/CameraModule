@@ -14,16 +14,19 @@ public:
     CalibratorWindow(const string calibratorWindow, const string imageWindow, const int maxWidth, const int maxHeight);
     void drawBoundary(Mat & image);
     void showWindow();
-    inline LineFunction getTopLineFunction()    { return LineFunction(Point(0, topLineY1), Point(maxWidth, topLineY2)); }
-    inline LineFunction getBottomLineFunction() { return LineFunction(Point(0, bottomLineY1), Point(maxWidth, bottomLineY2)); }
-    inline LineFunction getLeftLineFunction()   { return LineFunction(Point(leftLineX1, 0), Point(leftLineX2, maxWidth)); }
-    inline LineFunction getRightLineFunction()  { return LineFunction(Point(rightLineX1, 0), Point(rightLineX2, maxWidth)); }
+
     bool isInsideBoundary(Point point);
-    inline int getFeatureMinHessian() {return this->featureMinHessian;}
     bool isUnderTopLine(Point point);
     bool isAboveBottomLine(Point point);
     bool isAboveLeftLine(Point point);
     bool isUnderRightLine(Point point);
+
+    inline LineFunction getTopLineFunction()    { return LineFunction(Point(0, topLineY1), Point(maxWidth, topLineY2)); }
+    inline LineFunction getBottomLineFunction() { return LineFunction(Point(0, bottomLineY1), Point(maxWidth, bottomLineY2)); }
+    inline LineFunction getLeftLineFunction()   { return LineFunction(Point(leftLineX1, 0), Point(leftLineX2, maxWidth)); }
+    inline LineFunction getRightLineFunction()  { return LineFunction(Point(rightLineX1, 0), Point(rightLineX2, maxWidth)); }
+    inline int getFeatureMinHessian() {return this->featureMinHessian;}
+    inline int getMinKeyPointSize() { return this->keyPointSizeTreshold; }
 
 private:
 
@@ -44,6 +47,7 @@ private:
     int margin;
     int proturdingThreshold;
     int featureMinHessian;
+    int keyPointSizeTreshold;
 
     void addTrackbarToWindow();
     static void onCalibratorChange(int value, void * userData);

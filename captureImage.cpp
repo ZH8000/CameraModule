@@ -19,12 +19,12 @@ class FeatureProcessor {
 
 public:
     FeatureProcessor(Mat * image, CalibratorWindow * calibrator);
-    int getFeatureCount(int featureThreshold);
     void drawFeatureCount(int featureCount);
     vector<KeyPoint> getValidKeyPoints();
     LineFunction getFitLine(vector<KeyPoint> keyPoints);
     void drawAngleInfo(double angle);
     void drawSlopeInfo(LineFunction & fitLine);
+    void drawBoundray();
 
 private:
 
@@ -51,21 +51,13 @@ vector<KeyPoint> FeatureProcessor::getValidKeyPoints() {
         if (calibrator->isUnderTopLine(it->pt) &&
             calibrator->isAboveLeftLine(it->pt) && 
             calibrator->isUnderRightLine(it->pt) &&
-            it->size <= 30) {
+            it->size <= calibrator->getMinKeyPointSize()) {
             keyPointsInBounds.push_back(*it);
         }
     }
 
     return keyPointsInBounds;
 }
-
-int FeatureProcessor::getFeatureCount(int featureThreshold) {
-    SurfFeatureDetector detector(featureThreshold);
-    vector<KeyPoint> keyPoints;
-    detector.detect(grayImage, keyPoints);
-    return keyPoints.size();
-}
-
 
 void FeatureProcessor::drawFeatureCount(int featureCount) {
 
@@ -102,6 +94,10 @@ void FeatureProcessor::drawAngleInfo(double angle) {
     message << "angle:" << angle;
     string messageString = message.str();
     putText(*image, messageString, Point(5, 130), CV_FONT_HERSHEY_PLAIN, 1, CV_RGB(255, 0, 0));
+}
+
+void FeatureProcessor::drawBoundray() {
+    calibrator->drawBoundary(*image);
 }
 
 
@@ -153,11 +149,8 @@ int main(int, char**)
         resize(frame, resizedImage, Size(MAX_WIDTH, MAX_HEIGHT));
 
         FeatureProcessor processor(&resizedImage, &calibrator);
-        int featureCount = processor.getFeatureCount(500);
-        processor.drawFeatureCount(featureCount);
-
-        calibrator.drawBoundary(resizedImage);
         vector<KeyPoint> keyPoints = processor.getValidKeyPoints();
+
         LineFunction fitLine = processor.getFitLine(keyPoints);
 
         if (fitLine.isValidFitLine()) {
@@ -167,6 +160,7 @@ int main(int, char**)
             processor.drawAngleInfo(angle);
         }
 
+        processor.drawFeatureCount(keyPoints.size());
         processor.drawSlopeInfo(fitLine);
         drawKeypoints(resizedImage, keyPoints, imageWithKeyPoints, CV_RGB(255, 0, 0), DrawMatchesFlags::DEFAULT);
 
