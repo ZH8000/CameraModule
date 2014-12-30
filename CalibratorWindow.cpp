@@ -1,6 +1,7 @@
 #include "CalibratorWindow.hpp"
-
-
+#include <iostream>
+#include <fstream>
+#include <string>
 
 bool CalibratorWindow::isInsideBoundary(Point point) {
     return isAboveLeftLine(point) && isUnderRightLine(point) &&
@@ -49,9 +50,26 @@ bool CalibratorWindow::isAboveBottomLine(Point point) {
     }
 }
 
+
+
 void CalibratorWindow::onCalibratorChange(int value, void * userData) {
 
     CalibratorWindow * calibrator = (CalibratorWindow *) userData;
+    ofstream configFile("config.txt", ios::out|ios::trunc);
+    configFile << calibrator->topLineY1 << endl;
+    configFile << calibrator->topLineY2 << endl;
+    configFile << calibrator->bottomLineY1 << endl;
+    configFile << calibrator->bottomLineY2 << endl;
+    configFile << calibrator->leftLineX1 << endl;
+    configFile << calibrator->leftLineX2 << endl;
+    configFile << calibrator->rightLineX1 << endl;
+    configFile << calibrator->rightLineX2 << endl;
+    configFile << calibrator->angleThreshold << endl;
+    configFile << calibrator->margin << endl;
+    configFile << calibrator->proturdingThreshold << endl;
+    configFile << calibrator->featureMinHessian << endl;
+    configFile << calibrator->keyPointSizeTreshold << endl;
+    configFile.close();
 
     /*
     cout << "================================================" << "\n";
@@ -87,6 +105,52 @@ void CalibratorWindow::addTrackbarToWindow() {
     this->proturdingThreshold = 0;
     this->featureMinHessian = 800;
     this->keyPointSizeTreshold = 30;
+
+    ifstream configFile("config.txt");
+    string line;
+
+    if (configFile.is_open()) {
+        getline(configFile, line);
+        this->topLineY1 = atoi(line.c_str());
+
+        getline(configFile, line);
+        this->topLineY2 = atoi(line.c_str());
+
+        getline(configFile, line);
+        this->bottomLineY1 = atoi(line.c_str());
+
+        getline(configFile, line);
+        this->bottomLineY2 = atoi(line.c_str());
+
+        getline(configFile, line);
+        this->leftLineX1 = atoi(line.c_str());
+
+        getline(configFile, line);
+        this->leftLineX2 = atoi(line.c_str());
+
+        getline(configFile, line);
+        this->rightLineX1 = atoi(line.c_str());
+
+        getline(configFile, line);
+        this->rightLineX2 = atoi(line.c_str());
+
+        getline(configFile, line);
+        this->angleThreshold = atoi(line.c_str());
+
+        getline(configFile, line);
+        this->margin = atoi(line.c_str());
+
+        getline(configFile, line);
+        this->proturdingThreshold = atoi(line.c_str());
+
+        getline(configFile, line);
+        this->featureMinHessian = atoi(line.c_str());
+
+        getline(configFile, line);
+        this->keyPointSizeTreshold = atoi(line.c_str());
+
+        configFile.close();
+    }
 
     createTrackbar("TopLine Y1", calibratorWindow, &(this->topLineY1), maxHeight, &onCalibratorChange, this);
     createTrackbar("TopLine Y2", calibratorWindow, &(this->topLineY2), maxHeight, &onCalibratorChange, this);
