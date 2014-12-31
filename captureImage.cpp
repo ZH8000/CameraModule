@@ -6,7 +6,7 @@
 
 int main(int, char**)
 {
-    VideoCapture cap(0); // open the default camera
+    VideoCapture cap("/home/brianhsu/samples/%08d.jpg"); // open the default camera
 
     if(!cap.isOpened())  // check if we succeeded
         return -1;
@@ -27,21 +27,24 @@ int main(int, char**)
         ErrorDetector processor(&resizedImage, &calibrator);
         vector<KeyPoint> keyPoints = processor.getValidKeyPoints();
 
-        LineFunction fitLine = processor.getFitLine(keyPoints);
-        double angle = NAN;
-        double angleDiff = NAN;
-        
-        bool isOblique = processor.isOblique(fitLine, angle, angleDiff);
+        if (keyPoints.size() >= calibrator.getMinKeyPoint()) {
+            LineFunction fitLine = processor.getFitLine(keyPoints);
+            double angle = NAN;
+            double angleDiff = NAN;
+            
+            bool isOblique = processor.isOblique(fitLine, keyPoints.size(), angle, angleDiff);
 
-        if (isOblique && !isnan(angle)) {
-            putText(resizedImage, "OBLIQUE!!", Point(50, 50), CV_FONT_HERSHEY_PLAIN, 1.5, CV_RGB(255, 255, 0));
+            if (isOblique && !isnan(angle)) {
+                putText(resizedImage, "OBLIQUE!!", Point(50, 50), CV_FONT_HERSHEY_PLAIN, 1.5, CV_RGB(255, 0, 0), 2);
+            }
+
+            processor.drawAngleInfo(angle);
+            processor.drawSlopeInfo(fitLine);
+            processor.drawKeyPoints();
         }
 
         processor.drawBoundary();
         processor.drawFeatureCount(keyPoints.size());
-        processor.drawAngleInfo(angle);
-        processor.drawSlopeInfo(fitLine);
-        processor.drawKeyPoints();
 
         imshow("Preview", resizedImage);
         waitKey(30);

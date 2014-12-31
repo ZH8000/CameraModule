@@ -26,8 +26,9 @@ public:
     inline LineFunction getLeftLineFunction()   { return LineFunction(Point(leftLineX1, 0), Point(leftLineX2, maxWidth)); }
     inline LineFunction getRightLineFunction()  { return LineFunction(Point(rightLineX1, 0), Point(rightLineX2, maxWidth)); }
     inline int getFeatureMinHessian() {return this->featureMinHessian;}
-    inline int getMinKeyPointSize() { return this->keyPointSizeTreshold; }
+    inline int getMinKeyPointSize() { return this->keyPointSizeThreshold; }
     inline int getMaxAngleDiff() { return this->angleThreshold; }
+    inline int getMinKeyPoint() { return this->keyPointCountThreshold; }
 
 private:
 
@@ -48,7 +49,8 @@ private:
     int margin;
     int proturdingThreshold;
     int featureMinHessian;
-    int keyPointSizeTreshold;
+    int keyPointSizeThreshold;
+    int keyPointCountThreshold;
 
     void addTrackbarToWindow();
     static void onCalibratorChange(int value, void * userData);

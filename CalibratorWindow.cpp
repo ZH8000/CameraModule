@@ -68,7 +68,9 @@ void CalibratorWindow::onCalibratorChange(int value, void * userData) {
     configFile << calibrator->margin << endl;
     configFile << calibrator->proturdingThreshold << endl;
     configFile << calibrator->featureMinHessian << endl;
-    configFile << calibrator->keyPointSizeTreshold << endl;
+    configFile << calibrator->keyPointSizeThreshold << endl;
+    configFile << calibrator->keyPointCountThreshold << endl;
+
     configFile.close();
 
     /*
@@ -104,7 +106,7 @@ void CalibratorWindow::addTrackbarToWindow() {
     this->margin = 0;
     this->proturdingThreshold = 0;
     this->featureMinHessian = 800;
-    this->keyPointSizeTreshold = 30;
+    this->keyPointSizeThreshold = 30;
 
     ifstream configFile("config.txt");
     string line;
@@ -147,7 +149,10 @@ void CalibratorWindow::addTrackbarToWindow() {
         this->featureMinHessian = atoi(line.c_str());
 
         getline(configFile, line);
-        this->keyPointSizeTreshold = atoi(line.c_str());
+        this->keyPointSizeThreshold = atoi(line.c_str());
+
+        getline(configFile, line);
+        this->keyPointCountThreshold = atoi(line.c_str());
 
         configFile.close();
     }
@@ -160,11 +165,12 @@ void CalibratorWindow::addTrackbarToWindow() {
     createTrackbar("LeftLine X2", calibratorWindow, &(this->leftLineX2), maxWidth, &onCalibratorChange, this);
     createTrackbar("RightLine X1", calibratorWindow, &(this->rightLineX1), maxWidth, &onCalibratorChange, this);
     createTrackbar("RightLine X2", calibratorWindow, &(this->rightLineX2), maxWidth, &onCalibratorChange, this);
-    createTrackbar("Angle Threshold", calibratorWindow, &(this->angleThreshold), 90);
-    createTrackbar("Inside Margin", calibratorWindow, &(this->margin), 100);
-    createTrackbar("Proturding Threshold", calibratorWindow, &(this->proturdingThreshold), 100);
-    createTrackbar("Feature Min Hessian", calibratorWindow, &(this->featureMinHessian), 2000);
-    createTrackbar("Key Point Size Treshold", calibratorWindow, &(this->keyPointSizeTreshold), 200);
+    createTrackbar("Angle Threshold", calibratorWindow, &(this->angleThreshold), 90, &onCalibratorChange, this);
+    createTrackbar("Inside Margin", calibratorWindow, &(this->margin), 100, &onCalibratorChange, this);
+    createTrackbar("Proturding Threshold", calibratorWindow, &(this->proturdingThreshold), 100, &onCalibratorChange, this);
+    createTrackbar("Feature Min Hessian", calibratorWindow, &(this->featureMinHessian), 2000, &onCalibratorChange, this);
+    createTrackbar("Key Point Size Threshold", calibratorWindow, &(this->keyPointSizeThreshold), 200, &onCalibratorChange, this);
+    createTrackbar("Key Point Count Threshold", calibratorWindow, &(this->keyPointCountThreshold), 200, &onCalibratorChange, this);
 
 }
 

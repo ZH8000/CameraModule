@@ -117,9 +117,9 @@ LineFunction ErrorDetector::getFitLine(vector<KeyPoint> keyPoints) {
     return LineFunction::fromInverseXY(slope, c0);
 }
 
-bool ErrorDetector::isOblique(LineFunction fitLine, double & angle, double & angleDiff) {
+bool ErrorDetector::isOblique(LineFunction fitLine, int keyPointCount, double & angle, double & angleDiff) {
 
-    if (fitLine.isValidFitLine()) {
+    if (fitLine.isValidFitLine() && keyPointCount >= calibrator->getMinKeyPoint()) {
         LineFunction bottomLine = calibrator->getBottomLineFunction();
         angle = bottomLine.getAngleWith(fitLine);
         angleDiff = bottomLine.getAngleDiffWith(fitLine);

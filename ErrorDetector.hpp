@@ -28,7 +28,7 @@ public:
     void drawBoundary();
     void drawKeyPoints();
     double detectOblique(LineFunction fitLine);
-    bool isOblique(LineFunction fitLine, double & angle, double & angleDiff);
+    bool isOblique(LineFunction fitLine, int keyPointCount, double & angle, double & angleDiff);
 
 private:
 
