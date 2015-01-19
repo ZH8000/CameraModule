@@ -6,9 +6,9 @@
 
 int main(int, char**)
 {
-    VideoCapture cap("/home/brianhsu/samples/%08d.jpg"); // open the default camera
+    VideoCapture cap(0);
 
-    if(!cap.isOpened())  // check if we succeeded
+    if(!cap.isOpened())
         return -1;
 
     namedWindow("Preview",1);
@@ -35,7 +35,7 @@ int main(int, char**)
             bool isOblique = processor.isOblique(fitLine, keyPoints.size(), angle, angleDiff);
 
             if (isOblique && !isnan(angle)) {
-                putText(resizedImage, "OBLIQUE!!", Point(50, 50), CV_FONT_HERSHEY_PLAIN, 1.5, CV_RGB(255, 0, 0), 2);
+                putText(resizedImage, "OBLIQUE", Point(10, 30), CV_FONT_HERSHEY_PLAIN, 1.5, CV_RGB(255, 0, 0), 2);
             }
 
             processor.drawAngleInfo(angle);
