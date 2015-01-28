@@ -6,36 +6,48 @@
 #define VOTING_THRESHOLD 2.0
 #include <sys/time.h>
 
-char * getOutputFolder() {
+char * getOutputFolder(char * cameraNo) {
+    char * result = (char *) malloc(sizeof(char) * 200);
     char * dateStamp = (char *) malloc(sizeof(char) * 200);
+    memset(result, 0, sizeof(char) * 200);
     memset(dateStamp, 0, sizeof(char) * 200);
     time_t timestamp;
     struct tm * tm;
     timestamp = time(NULL);
     tm = localtime(&timestamp);
-    strftime(dateStamp, 200, "output/%Y-%m-%d/%H/%M", tm);
-    return dateStamp;
+    strftime(dateStamp, 200, "/%Y-%m-%d/%H/%M", tm);
+    strcat(result, "output");
+    strcat(result, cameraNo);
+    strcat(result, dateStamp);
+    free(dateStamp);
+    return result;
 }
 
-char * getOutputRawFolder() {
+char * getOutputRawFolder(char * cameraNo) {
+    char * result = (char *) malloc(sizeof(char) * 200);
     char * dateStamp = (char *) malloc(sizeof(char) * 200);
+    memset(result, 0, sizeof(char) * 200);
     memset(dateStamp, 0, sizeof(char) * 200);
     time_t timestamp;
     struct tm * tm;
     timestamp = time(NULL);
     tm = localtime(&timestamp);
-    strftime(dateStamp, 200, "outputRaw/%Y-%m-%d/%H/%M", tm);
-    return dateStamp;
+    strftime(dateStamp, 200, "/%Y-%m-%d/%H/%M", tm);
+    strcat(result, "outputRaw");
+    strcat(result, cameraNo);
+    strcat(result, dateStamp);
+    free(dateStamp);
+    return result;
 }
 
 
-void saveImage(Mat & frame, Mat & result) {
+void saveImage(char * cameraNo, Mat & frame, Mat & result) {
     if (SAVE_IMAGE) {
         struct timeval tv;
         gettimeofday(&tv,NULL);
 
-        char * outputFolder = getOutputFolder();
-        char * outputRawFolder = getOutputRawFolder();
+        char * outputFolder = getOutputFolder(cameraNo);
+        char * outputRawFolder = getOutputRawFolder(cameraNo);
         char * filename = (char *) malloc(sizeof(char) * 500);
         char * rawFilename = (char *) malloc(sizeof(char) * 500);
 
@@ -46,9 +58,9 @@ void saveImage(Mat & frame, Mat & result) {
         memset(mkdirOutputRawFolder, 0, sizeof(char) * 100);
 
         strcat(mkdirOutputFolder, "mkdir -p ");
-        strcat(mkdirOutputFolder, getOutputFolder());
+        strcat(mkdirOutputFolder, outputFolder);
         strcat(mkdirOutputRawFolder, "mkdir -p ");
-        strcat(mkdirOutputRawFolder, getOutputRawFolder());
+        strcat(mkdirOutputRawFolder, outputRawFolder);
 
         system(mkdirOutputFolder);
         system(mkdirOutputRawFolder);
@@ -157,7 +169,7 @@ int main(int argc, char** argv)
         processor.drawTitle(cameraNo);
         processor.drawBoundary();
         processor.drawFeatureCount(keyPoints.size());
-        saveImage(frame, resizedImage);
+        saveImage(cameraNo, frame, resizedImage);
 
         imshow("Preview", resizedImage);
         waitKey(30);
