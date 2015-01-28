@@ -6,15 +6,20 @@
 #define VOTING_THRESHOLD 2.0
 #include <sys/time.h>
 
-void saveImage(Mat & mat) {
+void saveImage(Mat & frame, Mat & result) {
     if (SAVE_IMAGE) {
         struct timeval tv;
         gettimeofday(&tv,NULL);
-        char * filename = (char *) malloc(sizeof(char) * 100);
+        char * filename = (char *) malloc(sizeof(char) * 200);
+        char * rawFilename = (char *) malloc(sizeof(char) * 200);
         unsigned long long start_utime;
         start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
         sprintf(filename, "output/%16llu.png", start_utime);
-        imwrite(filename, mat);
+        sprintf(rawFilename, "outputRaw/%16llu.png", start_utime);
+        Mat resizedFrame;
+        resize(frame, resizedFrame, Size(MAX_WIDTH, MAX_HEIGHT));
+        imwrite(filename, result);
+        imwrite(rawFilename, resizedFrame);
     }
 }
 
@@ -102,7 +107,7 @@ int main(int argc, char** argv)
         processor.drawTitle(cameraNo);
         processor.drawBoundary();
         processor.drawFeatureCount(keyPoints.size());
-        saveImage(resizedImage);
+        saveImage(frame, resizedImage);
 
         imshow("Preview", resizedImage);
         waitKey(30);
