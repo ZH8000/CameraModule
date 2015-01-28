@@ -6,3 +6,4 @@ calibrator
 cmake_install.cmake
 !output/.keep
 output
+outputRaw

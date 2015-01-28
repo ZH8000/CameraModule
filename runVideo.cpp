@@ -6,20 +6,70 @@
 #define VOTING_THRESHOLD 2.0
 #include <sys/time.h>
 
+char * getOutputFolder() {
+    char * dateStamp = (char *) malloc(sizeof(char) * 200);
+    memset(dateStamp, 0, sizeof(char) * 200);
+    time_t timestamp;
+    struct tm * tm;
+    timestamp = time(NULL);
+    tm = localtime(&timestamp);
+    strftime(dateStamp, 200, "output/%Y-%m-%d/%H/%M", tm);
+    return dateStamp;
+}
+
+char * getOutputRawFolder() {
+    char * dateStamp = (char *) malloc(sizeof(char) * 200);
+    memset(dateStamp, 0, sizeof(char) * 200);
+    time_t timestamp;
+    struct tm * tm;
+    timestamp = time(NULL);
+    tm = localtime(&timestamp);
+    strftime(dateStamp, 200, "outputRaw/%Y-%m-%d/%H/%M", tm);
+    return dateStamp;
+}
+
+
 void saveImage(Mat & frame, Mat & result) {
     if (SAVE_IMAGE) {
         struct timeval tv;
         gettimeofday(&tv,NULL);
-        char * filename = (char *) malloc(sizeof(char) * 200);
-        char * rawFilename = (char *) malloc(sizeof(char) * 200);
+
+        char * outputFolder = getOutputFolder();
+        char * outputRawFolder = getOutputRawFolder();
+        char * filename = (char *) malloc(sizeof(char) * 500);
+        char * rawFilename = (char *) malloc(sizeof(char) * 500);
+
+        char * mkdirOutputFolder = (char *) malloc(sizeof(char) * 100);
+        char * mkdirOutputRawFolder = (char *) malloc(sizeof(char) * 100);
+
+        memset(mkdirOutputFolder, 0, sizeof(char) * 100);
+        memset(mkdirOutputRawFolder, 0, sizeof(char) * 100);
+
+        strcat(mkdirOutputFolder, "mkdir -p ");
+        strcat(mkdirOutputFolder, getOutputFolder());
+        strcat(mkdirOutputRawFolder, "mkdir -p ");
+        strcat(mkdirOutputRawFolder, getOutputRawFolder());
+
+        system(mkdirOutputFolder);
+        system(mkdirOutputRawFolder);
+        
         unsigned long long start_utime;
+
         start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
-        sprintf(filename, "output/%16llu.png", start_utime);
-        sprintf(rawFilename, "outputRaw/%16llu.png", start_utime);
+        sprintf(filename, "%s/%16llu.png", outputFolder, start_utime);
+        sprintf(rawFilename, "%s/%16llu.png", outputRawFolder, start_utime);
+
         Mat resizedFrame;
         resize(frame, resizedFrame, Size(MAX_WIDTH, MAX_HEIGHT));
         imwrite(filename, result);
         imwrite(rawFilename, resizedFrame);
+
+        free(outputFolder);
+        free(outputRawFolder);
+        free(filename);
+        free(rawFilename);
+        free(mkdirOutputFolder);
+        free(mkdirOutputRawFolder);
     }
 }
 
