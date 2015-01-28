@@ -29,6 +29,7 @@ public:
     void drawKeyPoints();
     double detectOblique(LineFunction fitLine);
     bool isOblique(LineFunction fitLine, int keyPointCount, double & angle, double & angleDiff);
+    void drawTitle(char * title);
 
 private:
 

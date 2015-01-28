@@ -50,12 +50,22 @@ bool CalibratorWindow::isAboveBottomLine(Point point) {
     }
 }
 
+char * CalibratorWindow::getConfigFilename() {
+    char * cameraName = this->cameraName;
+    char * filename = (char *) malloc(sizeof(char) * (strlen("config.txt-") + strlen(cameraName) + 1)); 
+    strcpy(filename, "config-");
+    strcat(filename, cameraName);
+    strcat(filename, ".txt");
+    return filename;
+}
 
 
 void CalibratorWindow::onCalibratorChange(int value, void * userData) {
 
     CalibratorWindow * calibrator = (CalibratorWindow *) userData;
-    ofstream configFile("config.txt", ios::out|ios::trunc);
+    char * filename = calibrator->getConfigFilename();
+
+    ofstream configFile(filename, ios::out|ios::trunc);
     configFile << calibrator->topLineY1 << endl;
     configFile << calibrator->topLineY2 << endl;
     configFile << calibrator->bottomLineY1 << endl;
@@ -72,20 +82,15 @@ void CalibratorWindow::onCalibratorChange(int value, void * userData) {
     configFile << calibrator->keyPointCountThreshold << endl;
 
     configFile.close();
-
-    /*
-    cout << "================================================" << "\n";
-    cout << "TopBottom: " << calibrator->getTopLineFunction() << "\t\t" << calibrator->getBottomLineFunction() << "\n";
-    cout << "LeftRight: " << calibrator->getLeftLineFunction() << "\t\t" << calibrator->getRightLineFunction() << "\n";
-    cout << "================================================" << "\n";
-    */
+    free(filename);
 }
 
-CalibratorWindow::CalibratorWindow(const string calibratorWindow, const string imageWindow, const int maxWidth, const int maxHeight) {
+CalibratorWindow::CalibratorWindow(const string calibratorWindow, const string imageWindow, const int maxWidth, const int maxHeight, char * cameraName) {
     this->calibratorWindow = calibratorWindow;
     this->imageWindow = imageWindow;
     this->maxWidth = maxWidth;
     this->maxHeight = maxHeight;
+    this->cameraName = cameraName;
 }
 
 void CalibratorWindow::showWindow() {
@@ -108,7 +113,8 @@ void CalibratorWindow::addTrackbarToWindow() {
     this->featureMinHessian = 800;
     this->keyPointSizeThreshold = 30;
 
-    ifstream configFile("config.txt");
+    char * filename = this->getConfigFilename();
+    ifstream configFile(filename);
     string line;
 
     if (configFile.is_open()) {
@@ -156,6 +162,8 @@ void CalibratorWindow::addTrackbarToWindow() {
 
         configFile.close();
     }
+
+    free(filename);
 
     createTrackbar("TopLine Y1", calibratorWindow, &(this->topLineY1), maxHeight, &onCalibratorChange, this);
     createTrackbar("TopLine Y2", calibratorWindow, &(this->topLineY2), maxHeight, &onCalibratorChange, this);

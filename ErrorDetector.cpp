@@ -6,6 +6,14 @@ ErrorDetector::ErrorDetector(Mat * image, CalibratorWindow * calibrator) {
     cvtColor(*image, grayImage, CV_BGR2GRAY);
 }
 
+void ErrorDetector::drawTitle(char * title) {
+    std::stringstream message;
+    message << "Camera: " << title;
+    string messageString = message.str();
+    putText(*image, messageString, Point(10, 20), CV_FONT_HERSHEY_PLAIN, 1, CV_RGB(255, 0, 0));
+
+}
+
 vector<KeyPoint> ErrorDetector::getValidKeyPoints() {
     SurfFeatureDetector detector(calibrator->getFeatureMinHessian());
     vector<KeyPoint> keyPoints;

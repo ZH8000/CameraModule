@@ -12,7 +12,7 @@ int main(int, char**)
         return -1;
 
     namedWindow("Preview",1);
-    CalibratorWindow calibrator("Calibrator", "Preview", MAX_WIDTH, MAX_HEIGHT);
+    CalibratorWindow calibrator("Calibrator", "Preview", MAX_WIDTH, MAX_HEIGHT, "Camera0");
     calibrator.showWindow();
 
     for(;;)

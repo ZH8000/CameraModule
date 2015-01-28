@@ -18,15 +18,25 @@ void saveImage(Mat & mat) {
     }
 }
 
-int main(int, char**)
+int main(int argc, char** argv)
 {
-    VideoCapture cap("/home/brianhsu/samples/%08d.jpg"); // open the default camera
-
-    if(!cap.isOpened())  // check if we succeeded
+    if (argc != 2) {
+        cout << "Please use " << argv[0] << " [cameraNo] to run this program" << endl;
         return -1;
+    }
+
+    char * cameraNo = argv[1];
+
+    VideoCapture cap(atoi(cameraNo)); // open the default camera
+
+    if(!cap.isOpened())  {
+        cerr << "Cannot open camera for device " << argv[1] << endl;
+        return -1;
+    }
+ 
 
     namedWindow("Preview",1);
-    CalibratorWindow calibrator("Calibrator", "Preview", MAX_WIDTH, MAX_HEIGHT);
+    CalibratorWindow calibrator("Calibrator", "Preview", MAX_WIDTH, MAX_HEIGHT, cameraNo);
     calibrator.showWindow();
     
     int count = 0;
@@ -89,6 +99,7 @@ int main(int, char**)
             }
         }
 
+        processor.drawTitle(cameraNo);
         processor.drawBoundary();
         processor.drawFeatureCount(keyPoints.size());
         saveImage(resizedImage);

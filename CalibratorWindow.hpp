@@ -11,7 +11,7 @@ using namespace cv;
 class CalibratorWindow {
 
 public:
-    CalibratorWindow(const string calibratorWindow, const string imageWindow, const int maxWidth, const int maxHeight);
+    CalibratorWindow(const string calibratorWindow, const string imageWindow, const int maxWidth, const int maxHeight, char * camearName);
     void drawBoundary(Mat & image);
     void showWindow();
 
@@ -34,6 +34,7 @@ private:
 
     string calibratorWindow;
     string imageWindow;
+    char * cameraName;
     int maxWidth;
     int maxHeight;
 
@@ -54,6 +55,7 @@ private:
 
     void addTrackbarToWindow();
     static void onCalibratorChange(int value, void * userData);
+    char * getConfigFilename();
 
 
 };
