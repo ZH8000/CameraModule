@@ -126,7 +126,7 @@ int main(int argc, char** argv)
     calibrator.showWindow();
     
     int count = 0;
-    bool isKeyFrame = false;
+    bool shouldJudgeOblique = false;
     int totalFrame = 0;
     int obliqueCount = 0;
     char * logFilename = (char *) malloc(sizeof(char) * 100);
@@ -148,20 +148,28 @@ int main(int argc, char** argv)
         vector<KeyPoint> keyPoints = processor.getValidKeyPoints();
 
         if (keyPoints.size() >= calibrator.getMinKeyPoint()) {
-            isKeyFrame = true;
+            shouldJudgeOblique = true;
             LineFunction fitLine = processor.getFitLine(keyPoints);
             double angle = NAN;
             double angleDiff = NAN;
             
             bool isOblique = processor.isOblique(fitLine, keyPoints.size(), angle, angleDiff);
 
-            char * isKeyFrame = (char *) malloc(sizeof(char) * 100);
-            sprintf(isKeyFrame, "isKeyFrame:%d", totalFrame);
-            putText(resizedImage, isKeyFrame, Point(10, 230), CV_FONT_HERSHEY_PLAIN, 1, CV_RGB(255, 0, 0), 1);
+            char * keyFrameCountMessage = (char *) malloc(sizeof(char) * 100);
+            sprintf(keyFrameCountMessage, "keyFrameCount:%d", totalFrame);
+            putText(
+                resizedImage, keyFrameCountMessage, 
+                Point(10, 230), CV_FONT_HERSHEY_PLAIN, 1, 
+                CV_RGB(255, 0, 0), 1
+            );
+            free(keyFrameCountMessage);
  
             if (isOblique && !isnan(angle)) {
                 obliqueCount++;
-                putText(resizedImage, "OBLIQUE", Point(10, 30), CV_FONT_HERSHEY_PLAIN, 1.5, CV_RGB(255, 0, 0), 2);
+                putText(
+                    resizedImage, "OBLIQUE", Point(10, 30), CV_FONT_HERSHEY_PLAIN, 
+                    1.5, CV_RGB(255, 0, 0), 2
+                );
             }
 
             processor.drawAngleInfo(angle);
@@ -170,23 +178,33 @@ int main(int argc, char** argv)
             totalFrame++;
         } else {
 
-            if (isKeyFrame) {
+            if (shouldJudgeOblique) {
                 int threshold = (int) (totalFrame / VOTING_THRESHOLD);
 
                 char * leaveFrame = (char *) malloc(sizeof(char) * 100);
                 sprintf(leaveFrame, "result: %d/%d", obliqueCount, totalFrame);
-                putText(resizedImage, leaveFrame, Point(10, 210), CV_FONT_HERSHEY_PLAIN, 1, CV_RGB(255, 0, 0), 1);
+                putText(
+                    resizedImage, leaveFrame, Point(10, 210), CV_FONT_HERSHEY_PLAIN, 
+                    1, CV_RGB(255, 0, 0), 1
+                );
                 sprintf(leaveFrame, "threshold: %d", threshold);
-                putText(resizedImage, leaveFrame, Point(10, 230), CV_FONT_HERSHEY_PLAIN, 1, CV_RGB(255, 0, 0), 1);
+                putText(
+                    resizedImage, leaveFrame, Point(10, 230), CV_FONT_HERSHEY_PLAIN, 
+                    1, CV_RGB(255, 0, 0), 1
+                );
+                free(leaveFrame);
 
                 if (obliqueCount >= threshold) {
                     //! Send STOP singal!!!
-                    putText(resizedImage, "REAL OBLIQUE!!", Point(10, 30), CV_FONT_HERSHEY_PLAIN, 1.5, CV_RGB(255, 0, 0), 2);
+                    putText(
+                        resizedImage, "REAL OBLIQUE!!", Point(10, 30), CV_FONT_HERSHEY_PLAIN, 
+                        1.5, CV_RGB(255, 0, 0), 2
+                    );
                     isRealOblique = true;
                 }
 
                 totalFrame = 0;
-                isKeyFrame = false;
+                shouldJudgeOblique = false;
                 obliqueCount = 0;
             }
         }
