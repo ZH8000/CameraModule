@@ -51,7 +51,7 @@ bool CalibratorWindow::isAboveBottomLine(Point point) {
 }
 
 char * CalibratorWindow::getConfigFilename() {
-    char * cameraName = this->cameraName;
+    const char * cameraName = this->cameraName;
     char * filename = (char *) malloc(sizeof(char) * (strlen("config.txt-") + strlen(cameraName) + 1)); 
     strcpy(filename, "config-");
     strcat(filename, cameraName);
@@ -85,7 +85,7 @@ void CalibratorWindow::onCalibratorChange(int value, void * userData) {
     free(filename);
 }
 
-CalibratorWindow::CalibratorWindow(const string calibratorWindow, const string imageWindow, const int maxWidth, const int maxHeight, char * cameraName) {
+CalibratorWindow::CalibratorWindow(const string calibratorWindow, const string imageWindow, const int maxWidth, const int maxHeight, const char * cameraName) {
     this->calibratorWindow = calibratorWindow;
     this->imageWindow = imageWindow;
     this->maxWidth = maxWidth;

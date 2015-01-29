@@ -5,6 +5,7 @@
 #define SAVE_IMAGE  1
 #define VOTING_THRESHOLD 2.0
 #include <sys/time.h>
+#include <stdio.h>
 
 char * getOutputFolder(char * cameraNo) {
     char * result = (char *) malloc(sizeof(char) * 200);
@@ -40,8 +41,19 @@ char * getOutputRawFolder(char * cameraNo) {
     return result;
 }
 
+char * getTimestamp() {
+    char * dateStamp = (char *) malloc(sizeof(char) * 200);
+    memset(dateStamp, 0, sizeof(char) * 200);
+    time_t timestamp;
+    struct tm * tm;
+    timestamp = time(NULL);
+    tm = localtime(&timestamp);
+    strftime(dateStamp, 200, "%Y-%m-%d %H:%M:%S", tm);
+    return dateStamp;
+}
 
-void saveImage(char * cameraNo, Mat & frame, Mat & result) {
+
+void saveImage(char * cameraNo, Mat & frame, Mat & result, FILE * logFile, bool isRealOblique) {
     if (SAVE_IMAGE) {
         struct timeval tv;
         gettimeofday(&tv,NULL);
@@ -75,6 +87,13 @@ void saveImage(char * cameraNo, Mat & frame, Mat & result) {
         resize(frame, resizedFrame, Size(MAX_WIDTH, MAX_HEIGHT));
         imwrite(filename, result);
         imwrite(rawFilename, resizedFrame);
+
+        if (isRealOblique) {
+          char * timestamp = getTimestamp();
+          fprintf(logFile, "%s|%s\n", timestamp, filename);
+          fflush(logFile);
+          free(timestamp);
+        }
 
         free(outputFolder);
         free(outputRawFolder);
@@ -110,9 +129,14 @@ int main(int argc, char** argv)
     bool isKeyFrame = false;
     int totalFrame = 0;
     int obliqueCount = 0;
+    char * logFilename = (char *) malloc(sizeof(char) * 100);
+    memset(logFilename, 0, sizeof(char) * 100);
+    sprintf(logFilename, "log-%s.txt", cameraNo);
+    FILE * logFile = fopen(logFilename, "a");
 
     for(;;)
     {
+        bool isRealOblique = false;
         Mat frame;
         Mat resizedImage;
 
@@ -158,6 +182,7 @@ int main(int argc, char** argv)
                 if (obliqueCount >= threshold) {
                     //! Send STOP singal!!!
                     putText(resizedImage, "REAL OBLIQUE!!", Point(10, 30), CV_FONT_HERSHEY_PLAIN, 1.5, CV_RGB(255, 0, 0), 2);
+                    isRealOblique = true;
                 }
 
                 totalFrame = 0;
@@ -169,12 +194,13 @@ int main(int argc, char** argv)
         processor.drawTitle(cameraNo);
         processor.drawBoundary();
         processor.drawFeatureCount(keyPoints.size());
-        saveImage(cameraNo, frame, resizedImage);
+        saveImage(cameraNo, frame, resizedImage, logFile, isRealOblique);
 
         imshow("Preview", resizedImage);
         waitKey(30);
         count++;
     }
+    fclose(logFile);
 
     return 0;
 }

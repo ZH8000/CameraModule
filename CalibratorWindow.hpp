@@ -11,7 +11,7 @@ using namespace cv;
 class CalibratorWindow {
 
 public:
-    CalibratorWindow(const string calibratorWindow, const string imageWindow, const int maxWidth, const int maxHeight, char * camearName);
+    CalibratorWindow(const string calibratorWindow, const string imageWindow, const int maxWidth, const int maxHeight, const char * camearName);
     void drawBoundary(Mat & image);
     void showWindow();
 
@@ -34,7 +34,7 @@ private:
 
     string calibratorWindow;
     string imageWindow;
-    char * cameraName;
+    const char * cameraName;
     int maxWidth;
     int maxHeight;
 
